@@ -72,7 +72,7 @@
                         </p>
                         <hr>
                         <div style="max-height: 500px; overflow: auto;" id="m_Field">
-                            <div id="m_Messages">
+                            <div id="m_Messages" style="padding-right: 10px;">
                                 <div class="text-center pt-2">
                                     <div class="preloader-wrapper small active">
                                         <div class="spinner-layer spinner-blue-only">
@@ -89,9 +89,9 @@
                                     </div>
                                 </div>
                             </div>
-                            <div class="md-form m1-1 mb-0">
-                                <input type="text" id="m_Content" class="form-control" placeholder="Message Content">
-                            </div>
+                        </div>
+                        <div class="md-form m1-1 mb-0">
+                            <input type="text" id="m_Content" class="form-control" placeholder="Message Content">
                         </div>
                     </div>
                 </div>
@@ -125,11 +125,11 @@
                     let rank = `<i class="fas fa-users"></i>`;
                     // Message header
                     print += `
-                         <p class="message-header">
+                         <p class="message-header" style="margin: 0;">
                              <b class='message-user'>` + names[Math.floor(Math.random() * 3)] + `</b> ` + rank + `
                              <span class="float-right text-muted">` + '2 minutes ago' + `</span>
                          </p>
-                         <p class="message-content">` + data[i].message + "<br />";
+                         <p class="message-content">` + data[i].message + " <hr />";
                 }
                 print += `
                             </p>`;
