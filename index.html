@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- socket.io and jquery -->
+    <script src="js/socket.io.js"></script>
+    <!-- Bootstrap CSS, JQuery, Popper and JS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+        integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous" />
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"
+        integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+        integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+        crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+        integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+        crossorigin="anonymous"></script>
+    <script src="https://kit.fontawesome.com/0917022522.js" crossorigin="anonymous"></script>
+    <script src="js/jquery.js"></script>
+
+    <title>Clan Chat</title>
+    <style>
+        .container-fluid {
+            padding: 20px;
+            align-items: center;
+        }
+
+        .card {
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+            transition: 0.3s;
+        }
+
+        .cardPanel {
+            box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+            transition: 0.3s;
+            color: white;
+            background: linear-gradient(40deg, #45cafc, #303f9f) !important;
+            transform: translateY(-50%);
+            width: 70%;
+            height: 40px;
+            padding: 5px;
+            align-self: center;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="navbar navbar-dark bg-dark">
+        <div class="navbar-brand">Abs0rb.me Homies Preview</div>
+    </div>
+    <br><br>
+    <h1 class="text-center mb-4 mt-2">Discover clans</h1>
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-xs-12 col-sm-8 col-md-8 col-lg-8">
+                Makan is gay
+            </div>
+            <div class="col-xs-12 col-sm-4 mt-4">
+                <div class="card">
+                    <div class="cardPanel">
+                        <h5>Clan Chat</h5>
+                    </div>
+                    <div class="card-body">
+                        <strong>Dank Clan</strong>
+                        <span class="badge badge-success float-right">Nigga</span>
+                        <p>3 members
+                            <span class="float-right">You're a helper</span>
+                        </p>
+                        <hr>
+                        <div style="max-height: 500px; overflow: auto;" id="m_Field">
+                            <div id="m_Messages">
+                                <div class="text-center pt-2">
+                                    <div class="preloader-wrapper small active">
+                                        <div class="spinner-layer spinner-blue-only">
+                                            <div class="circle-clipper left">
+                                                <div class="circle"></div>
+                                            </div>
+                                            <div class="gap-patch">
+                                                <div class="circle"></div>
+                                            </div>
+                                            <div class="circle-clipper right">
+                                                <div class="circle"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="md-form m1-1 mb-0">
+                                <input type="text" id="m_Content" class="form-control" placeholder="Message Content">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer class="footer footer-dark bg-dark" style="color:antiquewhite; margin-bottom: 0;">
+        <div class="footer-copyright text-center py-3"><span id="copyrighted">Copyrighted by the cells</span> at <a
+                href="https://syntxproject.com">SyntxProject</a> (c) 2020</div>
+    </footer>
+</body>
+<script>
+    var print = "";
+    var server = "http://localhost:3000";
+    var io = io(server);
+
+    var content = document.getElementById("m_field"),
+        firstAttempt = true,
+        gatherInterval;
+
+    const names = ['Seth', 'Makan', 'Tancred']
+
+    function getMessages() {
+        $.ajax({
+            url: server + "/get_messages",
+            method: 'GET',
+            success: res => {
+                // parse the response
+                var data = JSON.parse(res);
+                for (var i = 0; i < data.length; i++) {
+                    let rank = `<i class="fas fa-users"></i>`;
+                    // Message header
+                    print += `
+                         <p class="message-header">
+                             <b class='message-user'>` + names[Math.floor(Math.random() * 3)] + `</b> ` + rank + `
+                             <span class="float-right text-muted">` + '2 minutes ago' + `</span>
+                         </p>
+                         <p class="message-content">` + data[i].message + "<br />";
+                }
+                print += `
+                            </p>`;
+
+                $("#m_Messages").html(print);
+            }
+        });
+    }
+    getMessages();
+
+    function sendMessage(e) {
+        var message = e.target.value;
+        // sending message from client
+        io.emit("new_message", message);
+        // make message box empty
+        $("#m_Content").val("");
+    }
+
+    // check for enter to send message
+    document.getElementById("m_Content").addEventListener("keydown", function (e) {
+        if (e.keyCode === 13) {
+            sendMessage(e);
+            $("#m_Content").val(""); // Make message box empty.
+        }
+    });
+
+    // listening to messages from server 
+    io.on("new_message", data => {
+        let rank = `<i class="fas fa-users"></i>`;
+        // Message header
+        print += `
+             <p class="message-header">
+                 <b class='message-user'>` + 'Tancred' + `</b> ` + rank + `
+                 <span class="float-right text-muted">` + '2 minutes ago' + `</span>
+             </p>
+             <p class="message-content">` + data + "<br />" + `</p`;
+        $("#m_Messages").html(print);
+    }); 
+</script>
+
+</html>
